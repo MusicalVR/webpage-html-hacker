@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      #matrixCanvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .dummy-terminal, .link-terminal {
+        font-size: 0.875rem;
+        line-height: 1.5;
+        border: 2px solid #333;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        z-index: 5;
+        border-radius: 8px;
+        overflow-y: auto;
+        background-color: black;
+        color: rgb(247, 252, 247);
+      }
+      .dummy-terminal {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 40rem;
+        height: 20rem;
+      }
+      .link-terminal {
+        position: absolute;
+        top: 640px;
+        left: 10px;
+        width: 40rem;
+        height: 20rem;
+      }
+      .link-terminal a {
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 flex items-center justify-center min-h-screen relative">
+    <canvas id="matrixCanvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+
+    <!-- Profile Card -->
+    <div class="bg-white shadow-lg rounded-2xl p-6 max-w-sm w-full text-center relative z-10">
+      <img src="placeholder.png" alt="Profile" class="w-auto h-auto mx-auto mb-4" />
+      <h1 class="text-4xl font-bold mb-2">Project Title</h1>
+      <p class="text-gray-600 text-2xl mb-4">Your Role or Tagline</p>
+      <p class="text-gray-700 text-lg mb-4">
+        Short description about your interests, profession, or mission.
+      </p>
+
+      <!-- System Stats -->
+      <div class="mt-6 text-center">
+        <h2 class="text-2xl font-bold mb-4">System Stats</h2>
+        <p class="text-gray-700 text-lg"><strong>CPU Usage:</strong> <span id="cpuUsage">0%</span></p>
+        <p class="text-gray-700 text-lg"><strong>Fan Speed:</strong> <span id="fanSpeed">0 RPM</span></p>
+        <p class="text-gray-700 text-lg"><strong>Temperature:</strong> <span id="temperature">0°C</span></p>
+      </div>
+    </div>
+
+    <!-- Simulated Nmap Terminal -->
+    <div class="dummy-terminal font-mono p-4 rounded-lg shadow-lg">
+      <p>$ nmap -sV 192.168.1.1</p>
+      <div id="terminalOutput"></div>
+    </div>
+
+    <!-- Useful Links Terminal -->
+    <div class="link-terminal font-mono p-4 rounded-lg shadow-lg">
+      <p>(user@machine)-[/home/user/links] #ls</p>
+      <ul>
+        <li><a href="https://github.com/MusicalVR" target="_blank" class="text-red-400 hover:text-green-300">GitHub</a></li>
+        <li><a href="https://www.docker.com" target="_blank" class="text-red-400 hover:text-green-300">Docker</a></li>
+        <li><a href="https://nmap.org" target="_blank" class="text-red-400 hover:text-green-300">Nmap</a></li>
+        <li><a href="https://www.kali.org" target="_blank" class="text-red-400 hover:text-green-300">Kali Linux</a></li>
+        <li><a href="https://www.ettercap-project.org" target="_blank" class="text-red-400 hover:text-green-300">Ettercap</a></li>
+      </ul>
+    </div>
+
+    <!-- Matrix Background -->
+    <script>
+      const canvas = document.getElementById("matrixCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      const fontSize = 16;
+      const columns = canvas.width / fontSize;
+      const drops = Array(Math.floor(columns)).fill(1);
+
+      function drawMatrix() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#0f0";
+        ctx.font = `${fontSize}px monospace`;
+
+        drops.forEach((y, index) => {
+          const text = letters[Math.floor(Math.random() * letters.length)];
+          const x = index * fontSize;
+          ctx.fillText(text, x, y * fontSize);
+          if (y * fontSize > canvas.height && Math.random() > 0.975) drops[index] = 0;
+          drops[index]++;
+        });
+      }
+
+      setInterval(drawMatrix, 50);
+      window.addEventListener("resize", () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+    </script>
+
+    <!-- Stats Updater -->
+    <script>
+      function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function updateStats() {
+        document.getElementById("cpuUsage").textContent = `${getRandomInt(10, 100)}%`;
+        document.getElementById("fanSpeed").textContent = `${getRandomInt(1000, 5000)} RPM`;
+        document.getElementById("temperature").textContent = `${getRandomInt(30, 90)}°C`;
+      }
+
+      setInterval(updateStats, 1000);
+    </script>
+
+    <!-- Simulate Nmap Output -->
+    <script>
+      const terminalOutput = document.getElementById("terminalOutput");
+      const nmapData = [
+        "Starting Nmap 7.91 ( https://nmap.org )",
+        "Nmap scan report for 192.168.1.1",
+        "Host is up (0.0012s latency).",
+        "PORT     STATE SERVICE       VERSION",
+        "22/tcp   open  ssh           OpenSSH 7.9",
+        "80/tcp   open  http          Apache 2.4",
+        "443/tcp  open  https         Apache 2.4",
+        "MAC Address: 00:1A:2B:3C:4D:5E",
+        "Service Info: OS: Linux",
+        "Nmap done: 1 IP address scanned."
+      ];
+      let index = 0;
+
+      function simulateNmapOutput() {
+        if (index < nmapData.length) {
+          const line = document.createElement("p");
+          line.textContent = nmapData[index];
+          terminalOutput.appendChild(line);
+          terminalOutput.scrollTop = terminalOutput.scrollHeight;
+          index++;
+        }
+      }
+
+      setInterval(simulateNmapOutput, 500);
+    </script>
+  </body>
+</html>
